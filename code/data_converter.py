@@ -2,6 +2,10 @@ import json
 import os
 
 def convert_user_data(data_json):
+    '''
+    Input: Users data json file
+    Output: A comprehensible dictionary of the users stats 
+    '''
     data = data_json["playerstats"]["stats"]
     for dict in data:
         if dict["name"] == "total_kills":
@@ -89,5 +93,9 @@ def wepon_name(id):
             return value
 
 def get_saved_users():
+    '''
+    Input: None
+    Output: All of the saved users in a list
+    '''
     users = [file for file in os.listdir(".\\data\\saved_users")]
     return users

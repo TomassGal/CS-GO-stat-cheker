@@ -7,6 +7,10 @@ from tkinter import messagebox
 
 
 def get_data(steam_link):
+    '''
+    Input: players steam link
+    Output: "data" and "name" in a dictionary
+    '''
     steamid = steam_api.get_steamid(steam_link)
     if steamid == None:
         messagebox.showerror(title="This user does not exist", message="The given steam link was invalid.")
@@ -26,32 +30,48 @@ def get_data(steam_link):
     return{"name": name, "data": data}
 
 def new_player_window():
+    '''
+    Input: None (gets steam link from player_link_input)
+    Output: None (Creates a new player data window)
+    '''
     player_data = get_data(player_link_input.get())
     if player_data == None:
         return
     ui.player_ui(player_data["data"], player_data["name"], window, small_backround_image)
 
-def new_user_window():
-    user_data = get_data(user_link_input.get())
-    ui.player_ui(user_data["data"], user_data["name"], window, small_backround_image)
-
-def new_user_window_link(link):
+def new_player_window_link(link):
+    '''
+    Input: Players steam link
+    Output: None (Creates a new player data window)
+    '''
     user_data = get_data(link)
     ui.player_ui(user_data["data"], user_data["name"], window, small_backround_image)
 
 def new_compare_window():
+    '''
+    Input: None (gets steam links from player_link_input and user_link_input)
+    Output: None (Creates a new player compare data window)
+    '''
     player_data = get_data(player_link_input.get())
     user_data = get_data(user_link_input.get())
     ui.compare_ui(user_data["data"], user_data["name"],player_data["data"], player_data["name"], window, big_backround_image)
 
 def new_saved_users_window():
-    ui.saved_users_window(window, new_user_window_link)
+    ui.saved_users_window(window, new_player_window_link)
 
 def save_active_user():
+    '''
+    Input: None
+    Output: None (Creates a new saved player window)
+    '''
     with open("data\\active_user.txt", "w") as file:
         file.write(user_link_input.get())
 
 def get_saved_active_user():
+    '''
+    Input: None
+    Output: Last active users steam link
+    '''
     try:
         with open(".\\data\\active_user.txt", "r") as file:
             user = file.read()
@@ -60,6 +80,10 @@ def get_saved_active_user():
         return ""
 
 def save_new_user():
+    '''
+    Input: None (Gets steam link from user_link_input)
+    Output: None (Adds steam link to saved users and active user)
+    '''
     if get_data(user_link_input.get()) == None:
         return
     users = data_converter.get_saved_users()
