@@ -1,7 +1,15 @@
 from urllib import response
 import requests
+from dotenv import load_dotenv
+import os
 
-STEAM_KEY = "8A92919CC2C3078A7637C62178C516A1"
+STEAM_KEY = None
+
+def setup():
+    global STEAM_KEY
+    load_dotenv()
+    STEAM_KEY = os.getenv('KEY')
+
 
 def get_stats(user_id:int):
     '''

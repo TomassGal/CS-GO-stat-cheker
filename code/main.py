@@ -5,6 +5,11 @@ from tkinter import *
 from tkinter import messagebox
 
 
+#----------------------------------------SETUP-----------------------------------#
+
+steam_api.setup()
+
+#----------------------------------------FUNCTIONALITY------------------------------------#
 
 def get_data(steam_link):
     '''
