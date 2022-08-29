@@ -2,18 +2,19 @@ import ui
 import steam_api
 import data_converter
 from tkinter import *
+from tkinter import messagebox
 
 
 
 def get_data(steam_link):
     steamid = steam_api.get_steamid(steam_link)
     if steamid == None:
-        ui.error_window("The given Steam link does not exist.", window)
+        messagebox.showerror(title="This user does not exist", message="The given steam link was invalid.")
         return None
 
     name = steam_api.get_player_name(steamid)
     if name == None:
-        ui.error_window("The given Steam link does not exist.", window)
+        messagebox.showerror(title="This user does not exist", message="The given steam link was invalid.")
         return None
 
     data_json = steam_api.get_stats(steamid)
@@ -34,23 +35,44 @@ def new_user_window():
     user_data = get_data(user_link_input.get())
     ui.player_ui(user_data["data"], user_data["name"], window, small_backround_image)
 
+def new_user_window_link(link):
+    user_data = get_data(link)
+    ui.player_ui(user_data["data"], user_data["name"], window, small_backround_image)
+
 def new_compare_window():
     player_data = get_data(player_link_input.get())
     user_data = get_data(user_link_input.get())
     ui.compare_ui(user_data["data"], user_data["name"],player_data["data"], player_data["name"], window, big_backround_image)
 
-def save_user():
-    with open("data\\saved_user.txt", "w") as file:
+def new_saved_users_window():
+    ui.saved_users_window(window, new_user_window_link)
+
+def save_active_user():
+    with open("data\\active_user.txt", "w") as file:
         file.write(user_link_input.get())
 
-def get_saved_user():
+def get_saved_active_user():
     try:
-        with open("data\\saved_user.txt", "r") as file:
+        with open(".\\data\\active_user.txt", "r") as file:
             user = file.read()
         return user
     except FileNotFoundError:
         return ""
 
+def save_new_user():
+    if get_data(user_link_input.get()) == None:
+        return
+    users = data_converter.get_saved_users()
+    for user in users:
+        with open(f".\\data\\saved_users\\{user}") as file:
+            link = file.readline()
+            if link == user_link_input.get():
+                messagebox.showerror(title="This user already exist", message="This user has already been saved.")
+                return
+    with open(f".\\data\\saved_users\\{steam_api.get_steamid(user_link_input.get())}.txt", "w") as file:
+        file.write(user_link_input.get())
+    messagebox.showinfo(title="User saved", message="User has been successfully saved")
+    save_active_user()
 
 #-----------------------------------UI----------------------------------#
 
@@ -73,53 +95,53 @@ image_canvas.place(x=0,y=0)
 
 user_link_text = Label(text="Your Steam proflie link: ", font=("Arial", 12))
 user_link_text.config(bg="#4b4b4b", fg="#FF9700")
-user_link_text.place(x=30, y=25)
+user_link_text.place(x=20, y=25)
 
 user_link_input_border = Frame(window, highlightbackground="black", highlightthickness=2, bd=0)
 
 user_link_input = Entry(user_link_input_border, width=55, font=("Arial", 8))
-user_link_input_border.place(x=200, y=30)
+user_link_input_border.place(x=190, y=30)
 user_link_input.config(bg="#C27300", borderwidth=0)
-user_link_input.insert(0, get_saved_user())
+user_link_input.insert(0, get_saved_active_user())
 user_link_input.pack()
-
-user_search_button_border = Frame(window, highlightbackground="black", highlightthickness=2, bd=0)
-
-user_search_button = Button(user_search_button_border, text="Search", font=("Arial", 10), command=new_user_window, padx=6, pady=2)
-user_search_button_border.place(x=542, y=25)
-user_search_button.config(bg="#C27300", borderwidth=0)
-user_search_button.pack()
 
 user_save_button_border = Frame(window, highlightbackground="black", highlightthickness=2, bd=0)
 
-user_save_button = Button(user_save_button_border, text="Save", font=("Arial", 10), command=save_user, padx=18, pady=2)
+user_save_button = Button(user_save_button_border, text="Save", font=("Arial", 10), command=save_new_user, padx=12, pady=2)
 user_save_button.config(bg="#C27300", borderwidth=0)
-user_save_button_border.place(x=615, y=25)
+user_save_button_border.place(x=532, y=25)
 user_save_button.pack()
+
+saved_users_button_border = Frame(window, highlightbackground="black", highlightthickness=2, bd=0)
+
+saved_users_button = Button(saved_users_button_border, text="Saved users", font=("Arial", 10), command=new_saved_users_window, padx=4, pady=2)
+saved_users_button_border.place(x=605, y=25)
+saved_users_button.config(bg="#C27300", borderwidth=0)
+saved_users_button.pack()
 
 player_link_text = Label(text="Steam proflie link: ", font=("Arial", 12))
 player_link_text.config(bg="#4b4b4b", fg="#FF9700")
-player_link_text.place(x=30, y=90)
+player_link_text.place(x=20, y=90)
 
 player_link_input_border = Frame(window, highlightbackground="black", highlightthickness=2, bd=0)
 
 player_link_input = Entry(player_link_input_border, width=55, font=("Arial", 8))
 player_link_input.config(bg="#C27300", borderwidth=0)
-player_link_input_border.place(x=200, y=95)
+player_link_input_border.place(x=190, y=95)
 player_link_input.pack()
 
 player_search_button_border = Frame(window, highlightbackground="black", highlightthickness=2, bd=0)
 
 player_search_button = Button(player_search_button_border, text="Search", font=("Arial", 10), command=new_player_window, padx=6, pady=2)
 player_search_button.config(bg="#C27300", borderwidth=0)
-player_search_button_border.place(x=542, y=90)
+player_search_button_border.place(x=532, y=90)
 player_search_button.pack()
 
 compare_button_border = Frame(window, highlightbackground="black", highlightthickness=2, bd=0)
 
-compare_button = Button(compare_button_border, text="Compare", font=("Arial", 10), command=new_compare_window, padx=6, pady=2)
+compare_button = Button(compare_button_border, text="Compare", font=("Arial", 10), command=new_compare_window, padx=13, pady=2)
 compare_button.config(bg="#C27300", borderwidth=0)
-compare_button_border.place(x=615, y=90)
+compare_button_border.place(x=605, y=90)
 compare_button.pack()
 
 window.mainloop()

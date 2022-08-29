@@ -1,5 +1,8 @@
 
 from tkinter import *
+from data_converter import get_saved_users
+import steam_api
+from tkinter import ttk
 
 #----------------------------------PLAYER UI----------------------------------------#
 
@@ -164,13 +167,6 @@ def compare_ui(user_data, user_name, player_data, player_name, window, image):
         user_kd_text.config(fg="red")
         players_kd_text.config(fg="green")
 
-    if(user_data['total_matches_played'] > player_data['total_matches_played']):
-        user_total_matches_text.config(fg="green")
-        player_total_matches_text.config(fg="red")
-    elif(user_data['total_matches_played'] < player_data['total_matches_played']):
-        user_total_matches_text.config(fg="red")
-        player_total_matches_text.config(fg="green")
-
     if(user_data['winrate'] > player_data['winrate']):
         user_winrate_text.config(fg="green")
         player_winrate_text.config(fg="red")
@@ -198,27 +194,6 @@ def compare_ui(user_data, user_name, player_data, player_name, window, image):
     elif(user_data['mvps'] < player_data['mvps']):
         user_mvps_text.config(fg="red")
         player_mvps_text.config(fg="green")
-
-    if(user_data['total_time_played'] > player_data['total_time_played']):
-        user_play_time_text.config(fg="green")
-        player_play_time_text.config(fg="red")
-    elif(user_data['total_time_played'] < player_data['total_time_played']):
-        user_play_time_text.config(fg="red")
-        player_play_time_text.config(fg="green")
-
-
-#---------------------------------------------ERROR UI----------------------------#
-def error_window(error_msg, window):
-    error_window = Toplevel(window)
-
-    error_window.iconbitmap(".\\resources\\csgo_93786.ico")
-    error_window.geometry("1000x600")
-    error_window.title("Invalid")
-    error_window.minsize(width=1000, height=600)
-    error_window.maxsize(width=1000, height=600)
-
-    error_text = Label(error_window, text=error_msg, font=("Arial", 12))
-    error_text.place(x=50, y=50)
 
 #-------------------------LAST GAME UI------------------------------------#
 def last_game_window(info):
@@ -261,3 +236,38 @@ def last_game_window(info):
     fav_wapon_title = Label(last_game_window, text=f"Favorite weapon: {data['last_match_fav_weapon']}",font=("Arial",12))
     fav_wapon_title.place(x=50,y=350)
 
+#----------------------------------------SAVED USERS UI-----------------------------------#
+
+def saved_users_window(window, function):
+    saved_window = Toplevel(window)
+
+    saved_window.iconbitmap(".\\resources\\csgo_93786.ico")
+    saved_window.geometry("600x400")
+    saved_window.title(f"Saved users")
+    saved_window.minsize(width=600, height=400)
+    saved_window.maxsize(width=600, height=400)
+
+    users = get_saved_users()
+
+    x_cord = 30
+    y_cord = 30
+    count = 0
+
+    for user in users:
+        with open(f".\\data\\saved_users\\{user}") as file:
+            link = file.readline()
+        name = steam_api.get_player_name(steam_api.get_steamid(link))
+
+        user_save_button_border = Frame(saved_window, highlightbackground="black", highlightthickness=2, bd=0)
+
+        user_save_button = Button(user_save_button_border, text=name, font=("Arial", 10), command=lambda m=link:function(m) , padx=12, pady=2)
+        user_save_button.config(bg="#C27300", borderwidth=0)
+        user_save_button_border.place(x=x_cord, y=y_cord)
+        user_save_button.pack()
+        print(f"BUtton placed {name}")
+        x_cord +=100
+        count+=1
+        if count == 4:
+            y_cord += 100
+            x_cord=30
+            count = 0

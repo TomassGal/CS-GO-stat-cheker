@@ -1,4 +1,5 @@
 import json
+import os
 
 def convert_user_data(data_json):
     data = data_json["playerstats"]["stats"]
@@ -86,3 +87,7 @@ def wepon_name(id):
     for key, value in data.items():
         if int(key) == id:
             return value
+
+def get_saved_users():
+    users = [file for file in os.listdir(".\\data\\saved_users")]
+    return users
