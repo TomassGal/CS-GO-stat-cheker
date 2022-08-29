@@ -264,7 +264,6 @@ def saved_users_window(window, function):
         user_save_button.config(bg="#C27300", borderwidth=0)
         user_save_button_border.place(x=x_cord, y=y_cord)
         user_save_button.pack()
-        print(f"BUtton placed {name}")
         x_cord +=100
         count+=1
         if count == 4:
