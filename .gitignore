@@ -1,4 +1,2 @@
 .env
 __pycache__
-data\saved_users\*
-!data\saved_users\.gitkeep
