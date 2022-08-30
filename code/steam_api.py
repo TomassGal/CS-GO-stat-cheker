@@ -1,4 +1,3 @@
-from urllib import response
 import requests
 from dotenv import load_dotenv
 import os
@@ -50,6 +49,7 @@ def get_steamid(profile_link:str):
     Input: users steam profile link.
     Output: users steamid.
     '''
+
     try:
 
         if "id/" in profile_link:

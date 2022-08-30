@@ -47,10 +47,11 @@ def new_player_window():
 def new_player_window_link(link):
     '''
     Input: Players steam link
-    Output: None (Creates a new player data window)
+    Output: None (Creates a new specified player data window)
     '''
     user_data = get_data(link)
-    ui.player_ui(user_data["data"], user_data["name"], window, small_backround_image)
+    file_name = f"{steam_api.get_steamid(link)}.txt"
+    ui.spec_player_ui(user_data["data"], user_data["name"], window, small_backround_image, file_name, save_stats, compare_history)
 
 def new_compare_window():
     '''
@@ -102,6 +103,26 @@ def save_new_user():
         file.write(user_link_input.get())
     messagebox.showinfo(title="User saved", message="User has been successfully saved")
     save_active_user()
+
+def save_stats(file_name: str):
+    with open(f".\\data\\saved_users\\{file_name}", "r") as file:
+        link = file.readline().replace("\n", "")
+        date = file.readline()
+        if date != "":
+            if not messagebox.askokcancel(title="Data has already been saved", message=f"You are already tracking data for this user from {date}, are you sure you want to override it?"):
+                return
+        data_converter.pack_data(file_name, link)
+
+def compare_history(file_name: str):
+    id = file_name.replace(".txt", "")
+    data = data_converter.get_compact_data(steam_api.get_stats(id))
+    histroy_data = data_converter.un_pack_data(file_name)
+    print(histroy_data)
+    with open(f".\\data\\saved_users\\{file_name}", "r") as file:
+        link = file.readline()
+        date = file.readline().replace("\n", "")
+
+    ui.compare_history_ui(data, histroy_data, date, window, big_backround_image)
 
 #-----------------------------------UI----------------------------------#
 
