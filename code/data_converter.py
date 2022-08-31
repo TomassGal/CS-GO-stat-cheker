@@ -51,7 +51,7 @@ def convert_user_data(data_json):
     try:
         last_match_kd = round(last_match_kills/last_match_deaths, 2)
     except ZeroDivisionError:
-        last_match_kd = 0
+        last_match_kd = last_match_kills
     last_match_favweapon = wepon_name(last_match_favweapon_id)
     mvps = int(round(total_mvps/total_rounds_played, 2) * 100)
     headshots = int(round(total_kills_headshot/kills, 2) * 100)
@@ -59,7 +59,7 @@ def convert_user_data(data_json):
     try:
         kd = round(kills/deaths, 2)
     except ZeroDivisionError:
-        kd = 0
+        kd = kills
     winrate = int(round(total_matches_won/total_matches_played, 2) * 100)
     last_adr = round(last_match_damage/last_match_rounds)
 
@@ -112,16 +112,19 @@ def pack_data(file_name, link: str):
 
     with open(f".\\data\\saved_users\\{file_name}", "w") as file:
         file.write(text)
-    un_pack_data(file_name)
     
-def un_pack_data(file_name):
+def unpack_data(file_name):
     with open(f".\\data\\saved_users\\{file_name}", "r") as file:
         data = file.readlines()
         data_dict = {}
         for pair in data[2:]:
             pair = pair.replace("\n", "")
             values = pair.split(":")
-            data_dict[values[0]] = float(values[1])
+            try:
+                data_dict[values[0]] = int(values[1])
+            except ValueError:
+                data_dict[values[0]] = float(values[1])
+
     return data_dict
 
 def get_compact_data(data_json):
@@ -159,7 +162,7 @@ def get_compact_data(data_json):
     try:
         kd = round(kills/deaths, 2)
     except ZeroDivisionError:
-        kd = 0
+        kd = kills
     winrate = int(round(total_matches_won/total_matches_played, 2) * 100)
 
     converted_data = {

@@ -6,7 +6,11 @@ from tkinter import messagebox
 
 
 #----------------------------------------SETUP-----------------------------------#
+window = Tk()
+small_backround_image = PhotoImage(file="resources\\small_backround.png")
+big_backround_image = PhotoImage(file="resources\\compare_backround.png")
 
+ui.set_up(small_backround_image, big_backround_image)
 steam_api.setup()
 
 #----------------------------------------FUNCTIONALITY------------------------------------#
@@ -42,16 +46,19 @@ def new_player_window():
     player_data = get_data(player_link_input.get())
     if player_data == None:
         return
-    ui.player_ui(player_data["data"], player_data["name"], window, small_backround_image)
+    ui.player_ui(player_data["data"], player_data["name"], window)
 
-def new_player_window_link(link):
+def new_player_window_link(data):
     '''
     Input: Players steam link
     Output: None (Creates a new specified player data window)
     '''
-    user_data = get_data(link)
-    file_name = f"{steam_api.get_steamid(link)}.txt"
-    ui.spec_player_ui(user_data["data"], user_data["name"], window, small_backround_image, file_name, save_stats, compare_history)
+    user_data = get_data(data["link"])
+    file_name = f"{steam_api.get_steamid(data['link'])}.txt"
+    ui.spec_player_ui(user_data["data"], user_data["name"], window,  file_name, save_stats, compare_history)
+
+    data["window"].destroy()
+    data["window"].update()
 
 def new_compare_window():
     '''
@@ -60,7 +67,7 @@ def new_compare_window():
     '''
     player_data = get_data(player_link_input.get())
     user_data = get_data(user_link_input.get())
-    ui.compare_ui(user_data["data"], user_data["name"],player_data["data"], player_data["name"], window, big_backround_image)
+    ui.compare_ui(user_data["data"], user_data["name"],player_data["data"], player_data["name"], window)
 
 def new_saved_users_window():
     ui.saved_users_window(window, new_player_window_link)
@@ -116,21 +123,21 @@ def save_stats(file_name: str):
 def compare_history(file_name: str):
     id = file_name.replace(".txt", "")
     data = data_converter.get_compact_data(steam_api.get_stats(id))
-    histroy_data = data_converter.un_pack_data(file_name)
-    print(histroy_data)
+    histroy_data = data_converter.unpack_data(file_name)
     with open(f".\\data\\saved_users\\{file_name}", "r") as file:
         link = file.readline()
         date = file.readline().replace("\n", "")
-
-    ui.compare_history_ui(data, histroy_data, date, window, big_backround_image)
+    if date == "":
+        messagebox.showerror(title="No data saved", message="You haven't saved data for this user. Press 'Start tracking' to save data.")
+        return
+    ui.compare_history_ui(data, histroy_data, date, window)
 
 #-----------------------------------UI----------------------------------#
 
-window = Tk()
+
 
 backround_image = PhotoImage(file="resources\\backround.png")
-small_backround_image = PhotoImage(file="resources\\small_backround.png")
-big_backround_image = PhotoImage(file="resources\\big_backround.png")
+
 
 window.config(bg="#4A4A4A")
 window.geometry("700x160")
